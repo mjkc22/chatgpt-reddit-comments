@@ -1,0 +1,598 @@
+SQL 정리
+
+1장 
+SELECT 문을 사용하는 데이터 검색
+
+기본
+
+select *
+from departments;
+
+select department_id, location_id
+from departments;
+
+산술표현식
+
+select last_name, salary, salary+300
+from departments;
+
+select last_name, salary, 12*salary+300
+from departments;
+
+select last_name, salary, 12*(salary+300)
+from departments;
+
+Null 값 정의
+
+select last_name, salary, commission_pct
+from departments;
+
+select last_name, 12*salary*commission_pct
+from departments;
+
+열 Alias 정의
+
+select last_name AS name, commission_pct comm
+from employees;
+
+select last_name "Name", salary*12 "Annual Salary"
+from employees;
+
+연결 연산자
+
+select last_name||job_id AS "Employees"
+from employees;
+
+select last_name||' is a '||job_id AS "Employee Details"
+from employees;
+
+select last_name||' : 1 Month salary = '||salary Monthly
+from employees;
+
+대체 인용 연산자
+
+select department_name ||q'[Department's Manager Id: ]'|| manager_id AS "Department and Manager"
+from departments;
+
+중복 행
+
+select department_id
+from employees;
+
+select DISTINCT department_id
+from employees;
+
+
+2장
+데이터 제한 및 정렬
+
+select employee_id, last_name, job_id, department_id
+from employees
+where department_id =90;
+
+문자열 및 날짜
+
+select employee_id, job_id, department_id
+from employees
+where last_name = 'Whalen' ;
+
+select last_name
+from employees
+where hire_date = '17-FEB-96' ;
+
+비교연산자
+
+select last_name, salary
+from employees
+where salary <= 3000;
+
+select last_name, salary
+from employees
+where between 2500 and 3000;
+
+select employee_id, last_name, salary, manager_id
+from employees
+where manager_id in (100, 101, 201);
+
+like 연산자를 사용하는 패턴 일치
+
+select first_name
+from employees
+where first_name like 'S%' ;
+
+select last_name
+from employees
+where last_name like '_o%' ;
+
+select employee_id, last_name, job_id
+from employees
+where job_id like '%SA\_%' escape '\' ;
+
+select last_name, manager_id
+from employees
+where manager_id is null;
+
+select employee_id, last_name, job_id, salary
+from employees
+where salary >= 10000
+and job_id like '%MAN%';
+
+select last_name, job_id
+from employees
+where job_id not in ('IT_PROG', 'ST_CLERK', 'SA_REP');
+
+order by  절 사용
+
+select last_name, job_id, department_id, hire_date
+from employees
+order by hire_date;
+
+select last_name, job_id, department_id, hire_date
+from employees
+order by hire_date desc;
+
+select employee_id, last_name, salary*12 annsal
+from employees
+order by annsal;
+
+select last_name, job_id, department_id, hire_date
+from employees
+order by 3;
+
+select last_name, job_id, department_id, hire_date
+from employees
+order by department_id, salary desc;
+
+치환 변수 사용
+
+select employee_id, last_name, salary, department_id
+from employees
+where department_id = &employee_num;
+
+select last_name, department_id, salary*12
+from employees
+where job_id = '&job_title' ; 
+
+select employee_id, last_name, job_id, column_name
+from employees
+where &condition
+order by &order_column;
+
+select employee_id, last_name, job_id, &&column_name
+from employees
+order by &column_name;
+
+
+3장
+단일 행 함수를 사용하여 결과물 변경
+
+select employee_id, last_name, department_id
+from employees
+where lower(last_name) = 'higgins';
+
+concat('Hello', 'World') : HelloWorld
+substr('HelloWorld', 1.5) : Hello
+length('HelloWorld') : 10
+instr('HelloWorld', 'W') : 6
+lpad(salary,10,'*') : *****240000
+rpad(salary,10,'*') : 24000*****
+replace('JACK and JUE', 'J', 'BL') : BLACK and BLUE
+trim('H' from 'HelloWorld') : elloWorld
+
+round(45.926, 2) : 45.93
+trunc(45.926, 2) : 45.92
+mod(1600, 300) : 100
+
+YY vs RR
+
+months_between('01-SEP-95', '11-JAN-94') : 19.6774194
+add_months('31-JAN-96', 1) : '29-FEB-96' 
+next_day('01-SEP-95', 'FRIDAY') : '08-SEP-95'
+last_dat('01-FEB-95') : '28-FEB-95' 
+round('25-JUL-03', 'month') : '01-AUG-03'
+round('25-JUL-03', 'year') : '01-JAN-04'
+trunc('25-JUL-03', 'month') : '01-JUL-03'
+trunc('25-JUL-03', 'year') : '01-JAN-03'
+
+
+4장
+변환 함수 및 조건부 표현식 사용
+
+날짜에 TO_CHAR 함수를 사용
+
+select employee_id, to_char(hire_date, 'MM/YY') Month_Hired
+FROM employees
+WHERE last_name = 'Higgins';
+
+HH24:MI:SS AM : 15:45:32 PM
+DD "of" MONTH : 12 of OCTOBER
+ddspth : fourteenth
+
+SELECT last_name, TO_CHAR(hire_date, ‘fmDdspth “of” Month YYYY
+fmHH:MI:SS AM’) HIREDATE
+from employees;
+
+숫자에 TO_CHAR 함수 사용
+
+select to_char(salary, '$99,999.00') SALARY
+from employees
+where last_name = 'Ernst';
+
+TO_NUMBER 및 TO_DATE 함수 사용
+
+SELECT last_name, hire_date
+FROM employees
+where hire_date = to_date('5월 11, 2004', 'fxMonth DD,YYYY);
+
+NVL 함수
+
+select last_name, salary, nvl(commission_pct, 0),
+(salary*12) + (salary*12*nvl(commission_pct, 0)) AN_SAL
+from employees;
+
+NVL2 함수
+
+select last_name, salary, commission_pct, nvl2(commission_pct, 'SAL+COMM', 'SAL') income
+from employees
+where department_id in (50,80);
+
+NULLIF 함수 사용
+
+select first_name, Length(first_name) "expr1",
+last_name, Length(last_name) "expr2",
+nullif(length(first_name), length(last_name)) result
+from employees;
+
+COALESCE 함수 사용
+
+select last_name, employee_id,
+coalesce(to_char(commission_pct), to_char(manager_id),
+'No commission and no manager')
+from employees'
+
+조건부 표현식
+
+select last_name, job_id, salary, case job_id 
+when 'IT_PROG' then 1.10*salary
+when 'ST_CLERK' then 1.15*salary
+when 'SA_REP' then 1.20*salary
+else salary end "REVISED_SALARY"
+from employees;
+
+decode 함수
+
+select last_name, salary, 
+decode (trunc(salary/2000, 0), 0, 0.00,
+1, 0.09, 2, 0.20, 3, 0.30, 4, 0.40, 5, 0.42, 6, 0.44, 0.45) TAX_RATE
+from employees
+where department_id = 80;
+
+5장
+그룹 함수를 사용한 집계 데이터 보고
+
+그룹 함수
+
+select avg(salary), max(salary), min(salary), sum(salary)
+from employees
+where job_id like '%REP%';
+
+select min(hire_date), max(hire_date)
+ffrom employees;
+ 
+#null 값 포함
+select count(*)
+from employees
+where department_id = 50;
+
+#null 값 미포함
+select count(commission_pct)
+from employees
+where department_id = 80;
+
+#unique 값 반환
+select count(distinct deparment_id)
+from employees
+where department_id = 80;
+
+데이터 그룹 생성 : GROUP BY 절
+
+select department_id, avg(salary)
+from employees
+group by department_id;
+
+select department_id, job_id, SUM(salary)
+from employees
+where department_id > 40
+group by department_id, job_id
+order by departmen_id
+
+select department_id, job_id, count(last_name)
+from employees
+group by department_id;
+
+select department_id, avg(salary)
+from employees
+group by department_id
+having avg(salary) > 8000;
+
+select department_id, max(salary)
+from employees
+group by department_id
+having max(salary) > 10000;
+
+select job_id, sum(salary) PAYROLL
+from employees
+where job_id not like '%REP%'
+group by job_id
+having sum(salary) > 13000
+order by sum(salary);
+
+select max(avg(salary))
+from employees
+group by department_id;
+
+6장 조인을 사용하여 여러테이블의 데이터 표시
+
+natural join
+
+select department_id, department_name, location_id, city
+from departments
+natural join locations;
+
+using 절로 join 생성
+
+select employee_id, last_name, location_id, department_id
+from employees join departments
+using (department_id)
+
+using 절에 테이블 alias 사용
+
+select l.city, d.department_name
+from locations l join departments d
+using (location_id)
+where d.location_id =1400:
+
+on 절로 join 생성
+
+select e.employee_id, e.last_name, e._department_id, d.department, d.location_id
+from employees e join departments d
+on (e.department_id = d.department_id);
+
+세 개 테이블 조인
+
+select employee_id, city, department_name
+from employees e
+join departments d
+on d.department_id = e.department_id
+join locations l
+on d.location_id = l.location_id;
+
+테이블 자체 조인(Self Join)
+
+select worker.last_name emp, manager.last_name mgr
+from employees worker join employees manager
+on (worker.manager_id = manager.employee_id);
+
+left outer join
+
+select e.last_name, e.department_id, d.department_name
+from employees e left outer join departments d
+on (e.department_id = d.department_id);
+
+
+right outer join
+
+select e.last_name, e.department_id, d.department_name
+from employees e right outer join departments d
+on (e.department_id = d.department_id);
+
+7장 Subquery를 사용하여 Query 해결
+
+select last_name, salary
+from employees
+wherer salary >
+(select salary
+from employees
+where last_name= 'Abel');
+
+subquery가 있는 having 절
+
+select department_id, min(salary)
+from employees
+groupby department_id
+having min(salary) > 
+(select min(salary)
+from employees
+where department_id =50);
+
+다중 행 subquery
+
+select employee_id, last_name, job_id, salary
+from employees
+where salary < any
+(select salary
+from employees
+where job_id = 'IT_PROG')
+and job_id <> 'IT_PROG'
+
+select employee_id, last_name, job_id, salary
+from employees
+where salary < all
+(select salary
+from employees
+where job_id = 'IT_PROG')
+and job_id <> 'IT_PROG'
+
+exists 연산자 사용
+
+select employee_id, salary, last_name
+from employees M
+where exists 
+(select employee_id
+from employees W
+where W.maager_id = M.employee_id
+and W.salary > 10000);
+
+select *
+from departments d
+where not exists 
+(select *
+from employees e
+where e.department_id = d.department_id)
+
+subquery의 null 값
+
+select emp.last_name
+from employees emp
+where emp.employee_id not in
+(select mgr.manager_id
+from employees mgr);
+
+8장 Set 연산자 사용
+
+usion 연산자
+
+select employee_id, job_id
+from employees
+union
+select employee_id, job_id
+from job_history;
+
+uniou all 연산자
+
+select employee_id, job_id, department_id
+from employees
+union all
+select employee_id, job_id, department_id
+from job_history
+order by employee_id;
+
+intersect 연산자
+
+select employee_id, job_id
+from employees
+intersect
+select employee_id, job_id
+from job_history
+
+minus 연산자
+
+select employee_id
+from employees
+minus
+select employee_id
+from job_history
+
+select 문 일치
+
+select location_id, department_name "Department", to_char(null) "Warehouse location"
+from departments
+union
+select location_id, to_char(null) "Departments", state_province
+from location;
+
+9장 데이터 조작
+
+insert into departments(department_id, department_name, manager_id, location_id)
+values (70, 'Public Relations', 100, 1700);
+
+스크립트 작성
+
+insert into departments(department_id, department_name, manager_id, location_id)
+values (&department_id, &department_name, &location);
+
+다른 테이블에서 행 복사
+
+insert into sales_reps(id, name, salary, commission_pct)
+select employee_id, last_name, salary, commission_pct
+from employees
+where job_id like '%rep%';
+
+테이블의 데이터 변경
+
+update employees
+set department_id = 50
+where employee_id = 113;
+
+update employees
+set job_id = 'IT_PROG', commission_pct = null
+where employee_id = 113;
+
+Subquery를 사용하여 열 갱신
+
+update employees
+set job_id =
+(select job_id
+from employees
+where emplyee_id = 205),
+salary =
+(select job_id
+from employees
+where emplyee_id = 205)
+where emplyee_id = 113;
+
+테이블에서 행 삭제
+
+delete from employees
+where department id =
+(select department_id
+from departments
+where department_name like '%Public%');
+
+truncate 문
+
+truncate table copy_emp;
+
+10장 DDL 문을 사용하여 테이블 생성 및 관리
+
+제약 조건 정의
+
+create tabele employees(
+employee_id number(6)
+constraint emp_emp_id_pk primary key,
+...);
+
+create table employees(
+...
+job_id emp_emp_id_pk
+primary key(employee_id));
+
+subquery를 사용하여 테이블 생성
+
+create table dept80 as
+select employee_id, last_name, salary*12 ANNSAL, hire_date
+from employees
+where department_id = 80;
+
+읽기 전용 테이블 
+
+alter table employees read only;
+
+alter table employees read write;
+
+11장 기타 스키마 객체 생성
+
+뷰 생성
+
+create view empvu80 as
+select employee_id, last_name, salary
+from employees
+where department_id = 80;
+
+뷰 수정
+
+create or replace view empvu80
+(id_number, name, sal, department_id) as
+select employee_id, first_name || ' ' || last_name, salary, department_id
+from employees
+where department_id = 80;
+
+복합 뷰 생성
+
+create or replace view dept_sum_vu
+(name, minsal, maxsal, avgsal) as
+select d.department_name, min(e.salary), max(e.salary), avg(e.salary)
+from employees e join departments d
+on (e.department_id = d.department_id
+group by d.department_name;
+
